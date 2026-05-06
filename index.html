@@ -1,0 +1,822 @@
+<!DOCTYPE html>
+<html lang="en" class="dark" x-data="contractSpark()" :class="{ 'dark': isDark }">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ContractSpark — Contracts That Protect You</title>
+  <meta name="description" content="Beautiful, intelligent contract generation for freelancers and small businesses. Create professional legal agreements in minutes." />
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet" />
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Alpine.js -->
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+  <!-- jsPDF -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.6.0/jspdf.plugin.autotable.min.js"></script>
+
+  <!-- Custom Styles -->
+  <link rel="stylesheet" href="css/style.css" />
+
+  <!-- Tailwind Config -->
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            display: ['Cormorant Garamond', 'Georgia', 'serif'],
+            body: ['DM Sans', 'system-ui', 'sans-serif'],
+            mono: ['DM Mono', 'monospace'],
+          },
+        }
+      }
+    }
+  </script>
+</head>
+
+<body
+  class="font-body bg-cs-bg text-cs-text min-h-screen transition-colors duration-500"
+  :style="`--accent: ${accentColor}; --accent-rgb: ${accentRgb};`"
+>
+
+  <!-- ═══════════════════════════════════════════
+       HEADER
+  ═══════════════════════════════════════════ -->
+  <header class="cs-header sticky top-0 z-50">
+    <div class="max-w-screen-2xl mx-auto px-6 h-16 flex items-center justify-between">
+
+      <!-- Logo -->
+      <a href="#" @click.prevent="resetToHome()" class="flex items-center gap-3 group">
+        <div class="cs-logo-mark">
+          <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+            <path d="M4 6C4 4.89543 4.89543 4 6 4H16L24 12V22C24 23.1046 23.1046 24 22 24H6C4.89543 24 4 23.1046 4 22V6Z" stroke="var(--accent)" stroke-width="1.5" fill="none"/>
+            <path d="M16 4V10C16 11.1046 16.8954 12 18 12H24" stroke="var(--accent)" stroke-width="1.5"/>
+            <path d="M9 16H19" stroke="var(--accent)" stroke-width="1.5" stroke-linecap="round"/>
+            <path d="M9 19H15" stroke="var(--accent)" stroke-width="1.5" stroke-linecap="round"/>
+            <circle cx="21" cy="19" r="1" fill="var(--accent)"/>
+          </svg>
+        </div>
+        <div>
+          <div class="font-display text-xl font-semibold tracking-tight leading-none text-cs-heading">ContractSpark</div>
+          <div class="text-[10px] font-mono text-cs-muted tracking-widest uppercase leading-none mt-0.5">Contracts That Protect You</div>
+        </div>
+      </a>
+
+      <!-- Nav Actions -->
+      <div class="flex items-center gap-3">
+
+        <!-- Saved Contracts -->
+        <button
+          x-show="savedContracts.length > 0"
+          @click="showSavedPanel = !showSavedPanel"
+          class="cs-btn-ghost text-sm gap-2"
+          title="Saved Contracts"
+        >
+          <svg width="15" height="15" viewBox="0 0 15 15" fill="none"><path d="M3 2.5C3 2.22386 3.22386 2 3.5 2H9.08579C9.21839 2 9.34557 2.05268 9.43934 2.14645L11.8536 4.56066C11.9473 4.65443 12 4.78161 12 4.91421V12.5C12 12.7761 11.7761 13 11.5 13H3.5C3.22386 13 3 12.7761 3 12.5V2.5ZM3.5 1C2.67157 1 2 1.67157 2 2.5V12.5C2 13.3284 2.67157 14 3.5 14H11.5C12.3284 14 13 13.3284 13 12.5V4.91421C13 4.51639 12.842 4.13486 12.5607 3.85355L10.1464 1.43934C9.86514 1.15804 9.48361 1 9.08579 1H3.5Z" fill="currentColor"/></svg>
+          <span x-text="savedContracts.length"></span>
+        </button>
+
+        <!-- GitHub -->
+        <a href="https://github.com/contractspark" target="_blank" class="cs-btn-ghost" title="View on GitHub" aria-label="GitHub">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0 1 12 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"/></svg>
+        </a>
+
+        <!-- Theme Toggle -->
+        <button @click="toggleTheme()" class="cs-btn-ghost" :title="isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'" aria-label="Toggle theme">
+          <svg x-show="isDark" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+          <svg x-show="!isDark" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        </button>
+
+      </div>
+    </div>
+  </header>
+
+  <!-- ═══════════════════════════════════════════
+       SAVED CONTRACTS PANEL
+  ═══════════════════════════════════════════ -->
+  <div
+    x-show="showSavedPanel"
+    @click.outside="showSavedPanel = false"
+    x-transition:enter="transition ease-out duration-200"
+    x-transition:enter-start="opacity-0 translate-y-2"
+    x-transition:enter-end="opacity-100 translate-y-0"
+    x-transition:leave="transition ease-in duration-150"
+    x-transition:leave-start="opacity-100 translate-y-0"
+    x-transition:leave-end="opacity-0 translate-y-2"
+    class="cs-saved-panel fixed top-20 right-6 z-50 w-80"
+  >
+    <div class="flex items-center justify-between mb-4">
+      <h3 class="font-display text-lg font-medium text-cs-heading">Saved Contracts</h3>
+      <button @click="showSavedPanel = false" class="text-cs-muted hover:text-cs-text transition-colors">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2 2L14 14M14 2L2 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+    <div class="space-y-2 max-h-72 overflow-y-auto cs-scroll">
+      <template x-for="(contract, index) in savedContracts" :key="index">
+        <div class="cs-saved-item group flex items-center justify-between p-3 rounded-lg cursor-pointer" @click="loadContract(index)">
+          <div class="flex-1 min-w-0">
+            <div class="text-sm font-medium text-cs-heading truncate" x-text="contract.meta.title || 'Untitled Contract'"></div>
+            <div class="text-xs text-cs-muted mt-0.5" x-text="contract.meta.type + ' · ' + formatDate(contract.meta.savedAt)"></div>
+          </div>
+          <button @click.stop="deleteContract(index)" class="opacity-0 group-hover:opacity-100 ml-2 text-cs-muted hover:text-red-400 transition-all">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M1 3.5H13M5.5 6.5V10.5M8.5 6.5V10.5M2.5 3.5L3.5 12.5H10.5L11.5 3.5M5 3.5V1.5H9V3.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+        </div>
+      </template>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════
+       MAIN APP
+  ═══════════════════════════════════════════ -->
+  <main>
+
+    <!-- ─────────────────────────────────────────
+         LANDING / HOME SCREEN
+    ───────────────────────────────────────── -->
+    <section
+      x-show="currentView === 'home'"
+      x-transition:enter="transition ease-out duration-500"
+      x-transition:enter-start="opacity-0"
+      x-transition:enter-end="opacity-100"
+    >
+
+      <!-- Hero -->
+      <div class="cs-hero relative overflow-hidden">
+        <div class="cs-hero-bg"></div>
+        <div class="max-w-4xl mx-auto px-6 pt-24 pb-20 text-center relative z-10">
+          <div class="cs-badge mb-8">✦ Version 1.0 — Free & Open Source</div>
+          <h1 class="font-display text-5xl md:text-7xl font-light text-cs-heading leading-[1.05] tracking-tight mb-6">
+            Contracts that look<br/>
+            <em class="cs-gradient-text not-italic">professional</em><br/>
+            and protect you.
+          </h1>
+          <p class="text-cs-muted text-lg md:text-xl font-light leading-relaxed max-w-2xl mx-auto mb-12">
+            Generate beautiful, intelligent agreements in minutes. Paste a brief, pick a template, and export a perfect PDF. Built for freelancers and small businesses who deserve better tools.
+          </p>
+
+          <!-- CTA Buttons -->
+          <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+            <button
+              @click="startSmartBuilder()"
+              class="cs-btn-primary group flex items-center gap-3 px-8 py-4 text-base"
+            >
+              <svg width="18" height="18" viewBox="0 0 18 18" fill="none" class="group-hover:rotate-12 transition-transform duration-300"><path d="M9 1L11.163 6.837L17 9L11.163 11.163L9 17L6.837 11.163L1 9L6.837 6.837L9 1Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
+              Smart Builder
+              <span class="text-xs opacity-60 font-mono">AI-Powered</span>
+            </button>
+            <button
+              @click="currentView = 'templates'"
+              class="cs-btn-secondary flex items-center gap-2 px-8 py-4 text-base"
+            >
+              <svg width="17" height="17" viewBox="0 0 17 17" fill="none"><rect x="1.5" y="1.5" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.3"/><rect x="10.5" y="1.5" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.3"/><rect x="1.5" y="10.5" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.3"/><rect x="10.5" y="10.5" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.3"/></svg>
+              Browse Templates
+            </button>
+          </div>
+        </div>
+
+        <!-- Floating Stats -->
+        <div class="max-w-3xl mx-auto px-6 pb-16 relative z-10">
+          <div class="cs-stats-row grid grid-cols-3 gap-4">
+            <div class="cs-stat-card text-center p-5">
+              <div class="font-display text-3xl font-light text-cs-heading">8+</div>
+              <div class="text-xs text-cs-muted mt-1 font-mono tracking-wide uppercase">Templates</div>
+            </div>
+            <div class="cs-stat-card text-center p-5">
+              <div class="font-display text-3xl font-light text-cs-heading">AI</div>
+              <div class="text-xs text-cs-muted mt-1 font-mono tracking-wide uppercase">Smart Builder</div>
+            </div>
+            <div class="cs-stat-card text-center p-5">
+              <div class="font-display text-3xl font-light text-cs-heading">PDF</div>
+              <div class="text-xs text-cs-muted mt-1 font-mono tracking-wide uppercase">One-Click Export</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Template Gallery -->
+      <div class="max-w-screen-xl mx-auto px-6 py-20">
+        <div class="flex items-end justify-between mb-12">
+          <div>
+            <div class="cs-section-label mb-3">Templates</div>
+            <h2 class="font-display text-4xl font-light text-cs-heading">Choose your agreement</h2>
+          </div>
+          <button @click="currentView = 'templates'" class="cs-btn-ghost text-sm">
+            View all →
+          </button>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <template x-for="(template, index) in featuredTemplates" :key="template.id">
+            <div
+              class="cs-template-card group cursor-pointer"
+              :class="`cs-template-card--delay-${index}`"
+              @click="selectTemplate(template)"
+            >
+              <div class="cs-template-icon mb-4" x-html="template.icon"></div>
+              <h3 class="font-display text-xl font-medium text-cs-heading mb-2 group-hover:text-accent transition-colors" x-text="template.name"></h3>
+              <p class="text-cs-muted text-sm leading-relaxed" x-text="template.description"></p>
+              <div class="mt-4 flex items-center gap-2">
+                <template x-for="tag in template.tags">
+                  <span class="cs-tag" x-text="tag"></span>
+                </template>
+              </div>
+              <div class="mt-5 cs-template-arrow">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8H13M13 8L9 4M13 8L9 12" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </div>
+            </div>
+          </template>
+        </div>
+      </div>
+
+      <!-- Features Strip -->
+      <div class="cs-features-strip py-16">
+        <div class="max-w-screen-xl mx-auto px-6">
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div class="cs-feature-item">
+              <div class="cs-feature-icon">
+                <svg width="22" height="22" viewBox="0 0 22 22" fill="none"><path d="M11 2L13.5 8.5H20L14.5 12.5L16.5 19L11 15L5.5 19L7.5 12.5L2 8.5H8.5L11 2Z" stroke="var(--accent)" stroke-width="1.5" stroke-linejoin="round"/></svg>
+              </div>
+              <h3 class="font-display text-xl font-medium text-cs-heading mb-2">Smart Generation</h3>
+              <p class="text-cs-muted text-sm leading-relaxed">Paste a project brief and watch a complete contract materialize — all clauses, terms, and professional language included.</p>
+            </div>
+            <div class="cs-feature-item">
+              <div class="cs-feature-icon">
+                <svg width="22" height="22" viewBox="0 0 22 22" fill="none"><rect x="2" y="3" width="18" height="16" rx="2" stroke="var(--accent)" stroke-width="1.5"/><path d="M6 8H16M6 12H13M6 16H10" stroke="var(--accent)" stroke-width="1.5" stroke-linecap="round"/></svg>
+              </div>
+              <h3 class="font-display text-xl font-medium text-cs-heading mb-2">Live Preview</h3>
+              <p class="text-cs-muted text-sm leading-relaxed">See your contract update in real-time as you type. What you see is exactly what you'll get when you export to PDF.</p>
+            </div>
+            <div class="cs-feature-item">
+              <div class="cs-feature-icon">
+                <svg width="22" height="22" viewBox="0 0 22 22" fill="none"><path d="M4 14L8 10L11 13L15 8L18 11" stroke="var(--accent)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 19H18M11 19V15" stroke="var(--accent)" stroke-width="1.5" stroke-linecap="round"/></svg>
+              </div>
+              <h3 class="font-display text-xl font-medium text-cs-heading mb-2">Perfect PDF Export</h3>
+              <p class="text-cs-muted text-sm leading-relaxed">One click generates a print-ready, professional PDF that looks like it came from a $200/month legal tool.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+
+    <!-- ─────────────────────────────────────────
+         SMART BUILDER VIEW
+    ───────────────────────────────────────── -->
+    <section
+      x-show="currentView === 'smart-builder'"
+      x-transition:enter="transition ease-out duration-400"
+      x-transition:enter-start="opacity-0 translate-y-4"
+      x-transition:enter-end="opacity-100 translate-y-0"
+      class="max-w-2xl mx-auto px-6 py-16"
+    >
+      <button @click="currentView = 'home'" class="cs-back-btn mb-8">← Back to Home</button>
+
+      <div class="cs-section-label mb-4">Smart Builder</div>
+      <h2 class="font-display text-4xl font-light text-cs-heading mb-3">Describe your project</h2>
+      <p class="text-cs-muted mb-8 leading-relaxed">Paste a client email, project brief, or scope of work — even rough notes. ContractSpark will generate a complete, professional contract instantly.</p>
+
+      <!-- Contract Type Selection -->
+      <div class="mb-6">
+        <label class="cs-label">Contract Type</label>
+        <div class="grid grid-cols-2 sm:grid-cols-3 gap-2 mt-2">
+          <template x-for="template in allTemplates">
+            <button
+              class="cs-type-chip"
+              :class="{ 'cs-type-chip--active': smartBuilderType === template.id }"
+              @click="smartBuilderType = template.id"
+              x-text="template.name"
+            ></button>
+          </template>
+        </div>
+      </div>
+
+      <!-- Brief Input -->
+      <div class="mb-6">
+        <label class="cs-label">Project Brief or Client Requirements</label>
+        <textarea
+          x-model="smartBuilderBrief"
+          class="cs-textarea mt-2"
+          rows="8"
+          placeholder="Example: 'I'm building a website for a restaurant client. The project includes design, development, and 3 rounds of revisions. Budget is $4,500 with 50% upfront and 50% on delivery. Timeline is 6 weeks. The client is Sarah's Bistro LLC in Chicago...'"
+        ></textarea>
+      </div>
+
+      <!-- Parties Quick Fill -->
+      <div class="grid grid-cols-2 gap-4 mb-8">
+        <div>
+          <label class="cs-label">Your Name / Company</label>
+          <input type="text" x-model="smartBuilderPartyA" class="cs-input mt-2" placeholder="Your Business Name" />
+        </div>
+        <div>
+          <label class="cs-label">Client Name / Company</label>
+          <input type="text" x-model="smartBuilderPartyB" class="cs-input mt-2" placeholder="Client Business Name" />
+        </div>
+      </div>
+
+      <button
+        @click="runSmartBuilder()"
+        :disabled="isGenerating || smartBuilderBrief.trim().length < 20"
+        class="cs-btn-primary w-full py-4 text-base flex items-center justify-center gap-3 disabled:opacity-40 disabled:cursor-not-allowed"
+      >
+        <template x-if="!isGenerating">
+          <span class="flex items-center gap-3">
+            <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M9 1L11.163 6.837L17 9L11.163 11.163L9 17L6.837 11.163L1 9L6.837 6.837L9 1Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
+            Generate Contract
+          </span>
+        </template>
+        <template x-if="isGenerating">
+          <span class="flex items-center gap-3">
+            <svg class="animate-spin" width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="7" stroke="currentColor" stroke-width="1.5" stroke-dasharray="22 22" stroke-linecap="round"/></svg>
+            Generating your contract…
+          </span>
+        </template>
+      </button>
+
+    </section>
+
+
+    <!-- ─────────────────────────────────────────
+         TEMPLATE BROWSER VIEW
+    ───────────────────────────────────────── -->
+    <section
+      x-show="currentView === 'templates'"
+      x-transition:enter="transition ease-out duration-400"
+      x-transition:enter-start="opacity-0 translate-y-4"
+      x-transition:enter-end="opacity-100 translate-y-0"
+      class="max-w-screen-xl mx-auto px-6 py-16"
+    >
+      <button @click="currentView = 'home'" class="cs-back-btn mb-8">← Back to Home</button>
+      <div class="flex items-end justify-between mb-12">
+        <div>
+          <div class="cs-section-label mb-3">All Templates</div>
+          <h2 class="font-display text-4xl font-light text-cs-heading">Choose your contract type</h2>
+        </div>
+      </div>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+        <template x-for="template in allTemplates" :key="template.id">
+          <div class="cs-template-card group cursor-pointer" @click="selectTemplate(template)">
+            <div class="cs-template-icon mb-4" x-html="template.icon"></div>
+            <h3 class="font-display text-xl font-medium text-cs-heading mb-2 group-hover:text-accent transition-colors" x-text="template.name"></h3>
+            <p class="text-cs-muted text-sm leading-relaxed" x-text="template.description"></p>
+            <div class="mt-4 flex flex-wrap items-center gap-2">
+              <template x-for="tag in template.tags">
+                <span class="cs-tag" x-text="tag"></span>
+              </template>
+            </div>
+          </div>
+        </template>
+      </div>
+    </section>
+
+
+    <!-- ─────────────────────────────────────────
+         BUILDER VIEW (Main Editor + Preview)
+    ───────────────────────────────────────── -->
+    <section
+      x-show="currentView === 'builder'"
+      x-transition:enter="transition ease-out duration-400"
+      x-transition:enter-start="opacity-0"
+      x-transition:enter-end="opacity-100"
+      class="min-h-screen"
+    >
+      <!-- Builder Topbar -->
+      <div class="cs-builder-topbar">
+        <div class="max-w-screen-2xl mx-auto px-6 py-3 flex items-center justify-between gap-4">
+          <div class="flex items-center gap-4 flex-1 min-w-0">
+            <button @click="currentView = 'home'" class="cs-back-btn flex-shrink-0">← Back</button>
+            <div class="cs-builder-title-wrap min-w-0">
+              <input
+                type="text"
+                x-model="contractData.meta.title"
+                class="cs-builder-title-input"
+                placeholder="Contract Title…"
+              />
+            </div>
+          </div>
+          <div class="flex items-center gap-2 flex-shrink-0">
+            <button @click="saveContract()" class="cs-btn-ghost text-sm gap-2 flex items-center">
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 12.5V2.5C2 1.94772 2.44772 1.5 3 1.5H9.58579C9.851 1.5 10.1054 1.60536 10.2929 1.79289L12.2071 3.70711C12.3946 3.89464 12.5 4.149 12.5 4.41421V12.5C12.5 13.0523 12.0523 13.5 11.5 13.5H3C2.44772 13.5 2 13.0523 2 12.5Z" stroke="currentColor" stroke-width="1.2"/><path d="M5 13.5V9.5H9.5V13.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/><path d="M4 1.5V5H9.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+              Save
+            </button>
+            <button @click="showPreviewMobile = !showPreviewMobile" class="cs-btn-ghost text-sm lg:hidden gap-2 flex items-center">
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="1" y="2" width="12" height="10" rx="1.5" stroke="currentColor" stroke-width="1.2"/><path d="M1 5H13" stroke="currentColor" stroke-width="1.2"/></svg>
+              Preview
+            </button>
+            <button @click="exportPDF()" class="cs-btn-primary text-sm gap-2 flex items-center px-4 py-2">
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 1V9M7 9L4 6M7 9L10 6" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/><path d="M1 11H13" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+              Export PDF
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Builder Layout -->
+      <div class="max-w-screen-2xl mx-auto flex h-[calc(100vh-112px)]">
+
+        <!-- Left Panel: Editor -->
+        <div class="cs-editor-panel w-full lg:w-[420px] xl:w-[480px] flex-shrink-0 overflow-y-auto cs-scroll border-r border-cs-border">
+
+          <!-- Tab Nav -->
+          <div class="cs-tab-nav sticky top-0 z-10">
+            <button
+              class="cs-tab"
+              :class="{ 'cs-tab--active': editorTab === 'details' }"
+              @click="editorTab = 'details'"
+            >Details</button>
+            <button
+              class="cs-tab"
+              :class="{ 'cs-tab--active': editorTab === 'clauses' }"
+              @click="editorTab = 'clauses'"
+            >Clauses</button>
+            <button
+              class="cs-tab"
+              :class="{ 'cs-tab--active': editorTab === 'style' }"
+              @click="editorTab = 'style'"
+            >Style</button>
+          </div>
+
+          <!-- Tab: Details -->
+          <div x-show="editorTab === 'details'" class="p-6 space-y-6">
+
+            <!-- Parties -->
+            <div class="cs-form-section">
+              <div class="cs-form-section-label">Parties</div>
+
+              <div class="space-y-4">
+                <div>
+                  <label class="cs-label">Service Provider / Your Company</label>
+                  <input type="text" x-model="contractData.partyA.name" @input="updatePreview()" class="cs-input mt-1.5" placeholder="Your Company Name" />
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                  <div>
+                    <label class="cs-label">Email</label>
+                    <input type="email" x-model="contractData.partyA.email" @input="updatePreview()" class="cs-input mt-1.5" placeholder="you@company.com" />
+                  </div>
+                  <div>
+                    <label class="cs-label">Phone</label>
+                    <input type="text" x-model="contractData.partyA.phone" @input="updatePreview()" class="cs-input mt-1.5" placeholder="+1 (555) 000-0000" />
+                  </div>
+                </div>
+                <div>
+                  <label class="cs-label">Address</label>
+                  <input type="text" x-model="contractData.partyA.address" @input="updatePreview()" class="cs-input mt-1.5" placeholder="123 Business St, City, State ZIP" />
+                </div>
+              </div>
+
+              <div class="cs-divider-sm"></div>
+
+              <div class="space-y-4">
+                <div>
+                  <label class="cs-label">Client / Other Party</label>
+                  <input type="text" x-model="contractData.partyB.name" @input="updatePreview()" class="cs-input mt-1.5" placeholder="Client Company Name" />
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                  <div>
+                    <label class="cs-label">Email</label>
+                    <input type="email" x-model="contractData.partyB.email" @input="updatePreview()" class="cs-input mt-1.5" placeholder="client@company.com" />
+                  </div>
+                  <div>
+                    <label class="cs-label">Phone</label>
+                    <input type="text" x-model="contractData.partyB.phone" @input="updatePreview()" class="cs-input mt-1.5" placeholder="+1 (555) 000-0000" />
+                  </div>
+                </div>
+                <div>
+                  <label class="cs-label">Address</label>
+                  <input type="text" x-model="contractData.partyB.address" @input="updatePreview()" class="cs-input mt-1.5" placeholder="456 Client Ave, City, State ZIP" />
+                </div>
+              </div>
+            </div>
+
+            <!-- Contract Details -->
+            <div class="cs-form-section">
+              <div class="cs-form-section-label">Contract Details</div>
+              <div class="space-y-4">
+                <div class="grid grid-cols-2 gap-3">
+                  <div>
+                    <label class="cs-label">Effective Date</label>
+                    <input type="date" x-model="contractData.effectiveDate" @input="updatePreview()" class="cs-input mt-1.5" />
+                  </div>
+                  <div>
+                    <label class="cs-label">End Date (optional)</label>
+                    <input type="date" x-model="contractData.endDate" @input="updatePreview()" class="cs-input mt-1.5" />
+                  </div>
+                </div>
+                <div>
+                  <label class="cs-label">Governing Law (State/Country)</label>
+                  <input type="text" x-model="contractData.governingLaw" @input="updatePreview()" class="cs-input mt-1.5" placeholder="e.g. State of California, USA" />
+                </div>
+                <div>
+                  <label class="cs-label">Contract Reference Number (optional)</label>
+                  <input type="text" x-model="contractData.refNumber" @input="updatePreview()" class="cs-input mt-1.5" placeholder="e.g. CS-2024-001" />
+                </div>
+              </div>
+            </div>
+
+            <!-- Scope of Work -->
+            <div class="cs-form-section">
+              <div class="cs-form-section-label">Scope of Work</div>
+              <textarea
+                x-model="contractData.scopeOfWork"
+                @input="updatePreview()"
+                class="cs-textarea"
+                rows="5"
+                placeholder="Describe the services, deliverables, and work to be performed…"
+              ></textarea>
+            </div>
+
+            <!-- Payment Terms -->
+            <div class="cs-form-section" x-show="contractData.meta.type !== 'nda'">
+              <div class="cs-form-section-label">Payment Terms</div>
+              <div class="space-y-4">
+                <div class="grid grid-cols-2 gap-3">
+                  <div>
+                    <label class="cs-label">Total Amount</label>
+                    <div class="cs-input-group mt-1.5">
+                      <span class="cs-input-prefix">$</span>
+                      <input type="number" x-model="contractData.payment.total" @input="updatePreview()" class="cs-input cs-input--prefixed" placeholder="0.00" />
+                    </div>
+                  </div>
+                  <div>
+                    <label class="cs-label">Currency</label>
+                    <select x-model="contractData.payment.currency" @change="updatePreview()" class="cs-input mt-1.5">
+                      <option>USD</option><option>EUR</option><option>GBP</option>
+                      <option>CAD</option><option>AUD</option><option>JPY</option>
+                    </select>
+                  </div>
+                </div>
+
+                <!-- Milestones -->
+                <div>
+                  <div class="flex items-center justify-between mb-2">
+                    <label class="cs-label">Payment Milestones</label>
+                    <button @click="addMilestone()" class="text-xs text-accent hover:text-accent-light transition-colors font-mono">+ Add</button>
+                  </div>
+                  <div class="space-y-2">
+                    <template x-for="(milestone, mIdx) in contractData.payment.milestones" :key="mIdx">
+                      <div class="flex gap-2 items-center">
+                        <input type="text" x-model="milestone.description" @input="updatePreview()" class="cs-input flex-1 text-sm" placeholder="e.g. Project kickoff" />
+                        <div class="cs-input-group w-24 flex-shrink-0">
+                          <span class="cs-input-prefix">%</span>
+                          <input type="number" x-model="milestone.percentage" @input="updatePreview()" class="cs-input cs-input--prefixed text-sm" placeholder="50" min="0" max="100" />
+                        </div>
+                        <button @click="removeMilestone(mIdx)" class="text-cs-muted hover:text-red-400 transition-colors flex-shrink-0">
+                          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 2L12 12M12 2L2 12" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+                        </button>
+                      </div>
+                    </template>
+                  </div>
+                  <div x-show="contractData.payment.milestones.length > 0" class="mt-2 text-xs text-cs-muted font-mono">
+                    Total: <span :class="milestonesTotal === 100 ? 'text-green-400' : 'text-yellow-400'" x-text="milestonesTotal + '%'"></span>
+                    <span x-show="milestonesTotal !== 100" class="ml-1 text-yellow-400">(should equal 100%)</span>
+                  </div>
+                </div>
+
+                <div>
+                  <label class="cs-label">Payment Due Terms</label>
+                  <select x-model="contractData.payment.dueTerm" @change="updatePreview()" class="cs-input mt-1.5">
+                    <option value="net15">Net 15 days</option>
+                    <option value="net30">Net 30 days</option>
+                    <option value="net45">Net 45 days</option>
+                    <option value="net60">Net 60 days</option>
+                    <option value="upon-completion">Upon completion</option>
+                    <option value="upfront">Upfront / Before work begins</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Tab: Clauses -->
+          <div x-show="editorTab === 'clauses'" class="p-6 space-y-4">
+            <p class="text-cs-muted text-sm leading-relaxed">Edit, reorder, or add clauses to your contract. Each clause appears in the preview.</p>
+
+            <div class="space-y-3">
+              <template x-for="(clause, cIdx) in contractData.clauses" :key="cIdx">
+                <div class="cs-clause-card" :class="{ 'cs-clause-card--disabled': !clause.enabled }">
+                  <div class="flex items-start gap-3">
+                    <div class="flex flex-col gap-1 mt-1 flex-shrink-0">
+                      <!-- Toggle -->
+                      <button
+                        @click="clause.enabled = !clause.enabled; updatePreview()"
+                        class="w-8 h-4 rounded-full transition-colors relative flex-shrink-0"
+                        :class="clause.enabled ? 'bg-accent' : 'bg-cs-border'"
+                        :title="clause.enabled ? 'Disable clause' : 'Enable clause'"
+                      >
+                        <span
+                          class="absolute top-0.5 w-3 h-3 rounded-full bg-white shadow transition-transform"
+                          :class="clause.enabled ? 'translate-x-4' : 'translate-x-0.5'"
+                        ></span>
+                      </button>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                      <input
+                        type="text"
+                        x-model="clause.title"
+                        @input="updatePreview()"
+                        class="cs-input-plain font-medium text-cs-heading text-sm mb-1 w-full"
+                        placeholder="Clause Title"
+                      />
+                      <textarea
+                        x-model="clause.content"
+                        @input="updatePreview()"
+                        class="cs-textarea-plain text-sm text-cs-muted leading-relaxed w-full"
+                        rows="3"
+                        placeholder="Clause content…"
+                      ></textarea>
+                    </div>
+                    <button @click="removeClause(cIdx)" class="flex-shrink-0 text-cs-muted hover:text-red-400 transition-colors mt-1">
+                      <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 2L12 12M12 2L2 12" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+                    </button>
+                  </div>
+                </div>
+              </template>
+            </div>
+
+            <button @click="addClause()" class="cs-btn-secondary w-full text-sm gap-2 flex items-center justify-center mt-2">
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 1V13M1 7H13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+              Add Clause
+            </button>
+          </div>
+
+          <!-- Tab: Style -->
+          <div x-show="editorTab === 'style'" class="p-6 space-y-6">
+
+            <div class="cs-form-section">
+              <div class="cs-form-section-label">Branding</div>
+
+              <!-- Logo Upload -->
+              <div class="mb-4">
+                <label class="cs-label">Company Logo</label>
+                <div
+                  class="cs-logo-upload mt-2"
+                  @click="$refs.logoInput.click()"
+                  @dragover.prevent
+                  @drop.prevent="handleLogoDrop($event)"
+                >
+                  <template x-if="!contractData.style.logoUrl">
+                    <div class="text-center py-6">
+                      <svg class="mx-auto mb-2 text-cs-muted" width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M21 15V19C21 19.5304 20.7893 20.0391 20.4142 20.4142C20.0391 20.7893 19.5304 21 19 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V15M17 8L12 3M12 3L7 8M12 3V15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                      <p class="text-xs text-cs-muted">Click or drag to upload logo</p>
+                      <p class="text-xs text-cs-muted/60 mt-1">PNG, JPG up to 2MB</p>
+                    </div>
+                  </template>
+                  <template x-if="contractData.style.logoUrl">
+                    <div class="py-3 flex items-center gap-3">
+                      <img :src="contractData.style.logoUrl" class="h-10 object-contain" alt="Logo preview" />
+                      <div class="flex-1 min-w-0">
+                        <p class="text-xs text-cs-muted">Logo uploaded</p>
+                        <button @click.stop="contractData.style.logoUrl = ''; updatePreview()" class="text-xs text-red-400 hover:text-red-300 transition-colors mt-0.5">Remove</button>
+                      </div>
+                    </div>
+                  </template>
+                </div>
+                <input type="file" x-ref="logoInput" accept="image/*" class="hidden" @change="handleLogoUpload($event)" />
+              </div>
+
+              <!-- Accent Color -->
+              <div>
+                <label class="cs-label">Accent Color</label>
+                <div class="flex items-center gap-3 mt-2">
+                  <div class="cs-color-swatches flex flex-wrap gap-2">
+                    <template x-for="color in colorSwatches" :key="color.value">
+                      <button
+                        class="cs-swatch"
+                        :style="`background-color: ${color.value}`"
+                        :class="{ 'cs-swatch--active': accentColor === color.value }"
+                        @click="setAccentColor(color.value)"
+                        :title="color.name"
+                      ></button>
+                    </template>
+                  </div>
+                  <input
+                    type="color"
+                    :value="accentColor"
+                    @input="setAccentColor($event.target.value)"
+                    class="cs-color-picker"
+                    title="Custom color"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <!-- Document Style -->
+            <div class="cs-form-section">
+              <div class="cs-form-section-label">Document Style</div>
+              <div class="space-y-4">
+                <div>
+                  <label class="cs-label">Header Style</label>
+                  <div class="grid grid-cols-3 gap-2 mt-2">
+                    <button
+                      class="cs-style-chip"
+                      :class="{ 'cs-style-chip--active': contractData.style.headerStyle === 'minimal' }"
+                      @click="contractData.style.headerStyle = 'minimal'; updatePreview()"
+                    >Minimal</button>
+                    <button
+                      class="cs-style-chip"
+                      :class="{ 'cs-style-chip--active': contractData.style.headerStyle === 'bold' }"
+                      @click="contractData.style.headerStyle = 'bold'; updatePreview()"
+                    >Bold</button>
+                    <button
+                      class="cs-style-chip"
+                      :class="{ 'cs-style-chip--active': contractData.style.headerStyle === 'classic' }"
+                      @click="contractData.style.headerStyle = 'classic'; updatePreview()"
+                    >Classic</button>
+                  </div>
+                </div>
+
+                <div>
+                  <label class="cs-label">Font Style</label>
+                  <div class="grid grid-cols-2 gap-2 mt-2">
+                    <button
+                      class="cs-style-chip"
+                      :class="{ 'cs-style-chip--active': contractData.style.fontStyle === 'serif' }"
+                      @click="contractData.style.fontStyle = 'serif'; updatePreview()"
+                    >Serif (Classic)</button>
+                    <button
+                      class="cs-style-chip"
+                      :class="{ 'cs-style-chip--active': contractData.style.fontStyle === 'sans' }"
+                      @click="contractData.style.fontStyle = 'sans'; updatePreview()"
+                    >Sans-serif (Modern)</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+
+        <!-- Right Panel: Live Preview -->
+        <div
+          class="cs-preview-panel flex-1 overflow-hidden hidden lg:flex flex-col"
+          :class="{ 'flex !flex-col': showPreviewMobile }"
+        >
+          <!-- Preview Toolbar -->
+          <div class="cs-preview-toolbar flex items-center justify-between px-6 py-3 border-b border-cs-border flex-shrink-0">
+            <div class="flex items-center gap-3">
+              <span class="text-xs text-cs-muted font-mono uppercase tracking-wider">Live Preview</span>
+              <span class="cs-live-dot"></span>
+            </div>
+            <div class="flex items-center gap-2">
+              <button @click="zoomPreview(-0.1)" class="cs-btn-ghost px-2 py-1 text-xs">−</button>
+              <span class="text-xs text-cs-muted font-mono w-10 text-center" x-text="Math.round(previewZoom * 100) + '%'"></span>
+              <button @click="zoomPreview(0.1)" class="cs-btn-ghost px-2 py-1 text-xs">+</button>
+              <div class="w-px h-4 bg-cs-border mx-1"></div>
+              <button @click="exportPDF()" class="cs-btn-primary text-xs px-3 py-1.5 flex items-center gap-1.5">
+                <svg width="11" height="11" viewBox="0 0 14 14" fill="none"><path d="M7 1V9M7 9L4 6M7 9L10 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M1 11H13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+                Export PDF
+              </button>
+            </div>
+          </div>
+
+          <!-- Preview Canvas -->
+          <div class="flex-1 overflow-auto cs-scroll cs-preview-canvas-bg p-8">
+            <div
+              class="cs-preview-page mx-auto"
+              :style="`transform: scale(${previewZoom}); transform-origin: top center;`"
+            >
+              <div id="contract-preview" x-html="previewHTML"></div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Toast Notification -->
+  <div
+    x-show="toast.visible"
+    x-transition:enter="transition ease-out duration-300"
+    x-transition:enter-start="opacity-0 translate-y-2"
+    x-transition:enter-end="opacity-100 translate-y-0"
+    x-transition:leave="transition ease-in duration-200"
+    x-transition:leave-start="opacity-100 translate-y-0"
+    x-transition:leave-end="opacity-0 translate-y-2"
+    class="cs-toast fixed bottom-6 left-1/2 -translate-x-1/2 z-50"
+    :class="toast.type === 'success' ? 'cs-toast--success' : toast.type === 'error' ? 'cs-toast--error' : ''"
+  >
+    <span x-text="toast.message"></span>
+  </div>
+
+  <!-- Scripts -->
+  <script src="js/utils.js"></script>
+  <script src="js/contract-data.js"></script>
+  <script src="js/smart-builder.js"></script>
+  <script src="js/preview-renderer.js"></script>
+  <script src="js/pdf-export.js"></script>
+  <script src="js/main.js"></script>
+
+</body>
+</html>
