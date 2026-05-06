@@ -2,6 +2,14 @@
 
 **Beautiful Contracts That Protect You**
 
+## ✨ Preview
+
+![ContractSpark Preview 1](./assets/preview-1.png)
+
+![ContractSpark Preview 2](./assets/preview-2.png)
+
+*Beautiful, professional contracts generated with ContractSpark*
+
 ContractSpark is a premium, open-source contract generator for freelancers and small businesses. Create professional legal agreements in minutes — powered by AI, exported as perfect PDFs.
 
 ---
@@ -152,4 +160,4 @@ Pull requests welcome! Please open an issue first to discuss major changes.
 
 ---
 
-*ContractSpark is not a law firm and does not provide legal advice. Contracts generated are templates and should be reviewed by a qualified attorney before use in important business transactions.*
+**Made with love ❤️ by [BlackBirdo](https://blackbirdo.com)**
