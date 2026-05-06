@@ -34,7 +34,7 @@ ContractSpark is a premium, open-source contract generator for freelancers and s
 
 ```bash
 # Clone the repo
-git clone https://github.com/yourusername/contractspark.git
+git clone https://github.com/ICodingStack/ContractSpark.git
 cd contractspark
 
 # Open in browser (no build step required)
